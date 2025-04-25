@@ -5,7 +5,7 @@ using Microsoft.VisualStudio.Shell;
 
 namespace RussComp6.Client
 {
-    internal class PersistentAuthenticationStateProvider : PersistentAuthenticationStateProvider
+    internal class PersistentAuthenticationStateProvider : AuthenticationStateProvider
     {
         private static readonly Task<AuthenticationState> defaultUnauthenticatedTask =
             Task.FromResult(new AuthenticationState(new ClaimsPrincipal(new ClaimsIdentity())));
