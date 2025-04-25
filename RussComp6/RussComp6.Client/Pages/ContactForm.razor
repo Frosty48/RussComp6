@@ -1,0 +1,97 @@
+﻿@page "/contactForm"
+@using System.ComponentModel.DataAnnotations
+
+<h3>Contact Form</h3>
+
+<EditForm Model="@contactForm" OnValidSubmit="HandleSubmit">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <div class="FirstName">
+        <label for="firstName" class="form-label">First Name</label>
+        <InputText id="firstName" class="form-control" @bind-Value="contactForm.FirstName" />
+        <ValidationMessage For="@(() => contactForm.FirstName)" />
+    </div>
+
+    <div class="LastName">
+        <label for="lastName" class="form-label">Last Name</label>
+        <InputText id="lastName" class="form-control" @bind-Value="contactForm.LastName" />
+        <ValidationMessage For="@(() => contactForm.LastName)" />
+    </div>
+
+    <div class="CompanyName">
+        <label for="companyName" class="form-label">Company Name</label>
+        <InputText id="companyName" class="form-control" @bind-Value="contactForm.CompanyName" />
+        <ValidationMessage For="@(() => contactForm.CompanyName)" />
+    </div>
+
+    <div class="Service">
+        <label>Service Interested In</label>
+        <div>
+            <InputCheckbox @bind-Value="contactForm.FinancialAdvice" /> Financial Advice
+        </div>
+        <div>
+            <InputCheckbox @bind-Value="contactForm.FreightForwarding" /> Freight Forwarding
+        </div>
+        <div>
+            <InputCheckbox @bind-Value="contactForm.InventoryAccounting" /> Inventory Accounting
+        </div>
+    </div>
+
+    <div class="Remarks">
+        <label for="remarks" class="form-label">Remarks</label>
+        <InputTextArea id="remarks" class="form-control" @bind-Value="contactForm.Remarks" />
+    </div>
+
+    <div class="Email">
+        <label for="email" class="form-label">Email</label>
+        <InputText id="email" class="form-control" @bind-Value="contactForm.Email" />
+        <ValidationMessage For="@(() => contactForm.Email)" />
+    </div>
+
+    <div class="PhoneNumber">
+        <label for="phoneNumber" class="form-label">Phone Number</label>
+        <InputText id="phoneNumber" class="form-control" @bind-Value="contactForm.PhoneNumber" />
+        <ValidationMessage For="@(() => contactForm.PhoneNumber)" />
+    </div>
+
+    <div class="website">
+        <label for="website" class="form-label">Website</label>
+        <InputText id="website" class="form-control" @bind-Value="contactForm.Website" />
+        <ValidationMessage For="@(() => contactForm.Website)" />
+    </div>
+
+    <button type="submit" class="btn btn-primary">Submit</button>
+</EditForm>
+
+@code {
+    private ContactFormModel contactForm = new ContactFormModel();
+
+    private void HandleSubmit()
+    {
+
+    }
+
+    public class ContactFormModel
+    {
+        [Required] 
+        public string? FirstName { get; set; }
+
+        [Required] 
+        public string? LastName { get; set; }
+
+        [MinLength(3)] public string? CompanyName { get; set; }
+
+
+        public bool FinancialAdvice { get; set; }
+        public bool FreightForwarding { get; set; }
+        public bool InventoryAccounting { get; set; }
+        public string? Remarks { get; set; }
+
+
+        [Required, EmailAddress] public string? Email { get; set; }
+        [Required, Phone] public string? PhoneNumber { get; set; }
+        [Required, Url] public string? Website { get; set; }
+        public DateTime DateSubmitted { get; set; } = DateTime.Now;
+    }
+}

@@ -1,0 +1,56 @@
+﻿@* @page "/InvestmentCalc"
+@inject InvestmecntCalc InvestmentCalc
+
+<h3>InvestmentCalculator</h3>
+
+<EditForm FormName="InvestCalc" Model=@InvestmentCalc OnValidSubmit=@HandleValidSubmit>
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <div class="form-group">
+        <label for="principle">Principle:</label>
+        <InputNumber id="principle" @bind-Value="InvestmentCalc.Principle" class="form-control" />
+        <ValidationMessage For="@(() => InvestmentCalc.Principle)" />
+    </div>
+
+    <div class="form-group">
+        <label for="interestRate">Annual Interest Rate (%):</label>
+        <InputNumber id="interestRate" @bind-Value="InvestmentCalc.InterestRate" class="form-control" />
+        <ValidationMessage For="@(() => InvestmentCalc.InterestRate)" />
+    </div>
+
+    <div class="form-group">
+        <label for="compoundsPerYear">Compounds Per Year:</label>
+        <InputNumber id="compoundsPerYear" @bind-Value="InvestmentCalc.CompoundsPerYear" class="form-control" />
+        <ValidationMessage For="@(() => InvestmentCalc.CompoundsPerYear)" />
+    </div>
+
+    <div class="form-group">
+        <label for="years">Years:</label>
+        <InputNumber id="years" @bind-Value="InvestmentCalc.Years" class="form-control" />
+        <ValidationMessage For="@(() => InvestmentCalc.Years)" />
+    </div>
+
+    <button type="submit" class="btn btn-primary">Calculate</button>
+    <button type="button" class="btn btn-secondary" @onclick="ClearForm">Clear</button>
+</EditForm>
+
+@if (InvestmentCalc.FutureValue > 0)
+{
+    <div class="alert alert-success mt-3">
+        <strong>Future Value:</strong> @InvestmentCalc.FutureValue.ToString("C")
+    </div>
+}
+
+@code {
+    private void HandleValidSubmit()
+    {
+        InvestmentCalc.Calc();
+    }  
+
+    private void ClearForm()
+    {
+        InvestmentCalc = new InvestmentCalc();
+    }
+}
+ *@

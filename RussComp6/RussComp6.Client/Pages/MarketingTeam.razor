@@ -1,0 +1,69 @@
+﻿@page "/marketingTeamContacts"
+@using Microsoft.AspNetCore.Authorization
+@attribute [Authorize(Roles = "Marketing")]
+
+<h3>MarketingTeamContactForm</h3>
+
+<div>
+    <label>
+        <input type="checkbox" @bind="showOpenOnly" />
+        Show Open Contacts Only
+    </label>
+</div>
+
+<table>
+    <thead>
+        <tr>
+            <th>Contact Name</th>
+            <th>Email</th>
+            <th>Date Received</th>
+            <th>Date Responded</th>
+            <th>Remarks</th>
+            <th>Action</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var contact in FilteredContacts)
+        {
+            <tr>
+                <td>@contact.Name</td>
+                <td>@contact.Email</td>
+                <td>@contact.DateReceived.ToString("a")</td>
+                <td>@contact.DateResponded?.ToString("a") ?? "Not Yet Responded"</td>
+                <td>@contact.Remarks</td>
+                <td>
+                    <button @onclick="() => MarkAsResponded(contact)">Mark as Responded</button>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+@code {
+    private List<Contact> Contacts = new()
+    {
+        new Contact { Name = "Lotus", Email = "lotus@example.com", DateReceived = DateTime.Now.AddHours(-5) },
+        new Contact { Name = "Gwimbly", Email = "gwimbly@example.com", DateReceived = DateTime.Now.AddDays(-1), DateResponded = DateTime.Now.AddHours(-3), Remarks = "Pending confirmation" },
+    };
+
+    private bool showOpenOnly = false;
+
+    private IEnumerable<Contact> FilteredContacts =>
+        showOpenOnly ? Contacts.Where(c => c.DateResponded == null).OrderByDescending(c => c.DateReceived)
+        : Contacts.OrderByDescending(c => c.DateReceived);
+
+    private void MarkAsResponded(Contact contact)
+    {
+        contact.DateResponded = DateTime.Now;
+        // Save changes to the database here
+    }
+
+    public class Contact
+    {
+        public string? Name { get; set; }
+        public string? Email { get; set; }
+        public DateTime DateReceived { get; set; }
+        public DateTime? DateResponded { get; set; }
+        public string Remarks { get; set; }
+    }
+}

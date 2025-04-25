@@ -1,0 +1,145 @@
+﻿@page "/assets"
+@inject NavigationManager Navigation
+@inject ApplicationDbContext Database
+@using RussComp6.Components.Models
+@using RussComp6.Data
+
+<h3>Assets</h3>
+
+@* Table to display alll assets for the user*@
+<table class="table">
+	<thead>
+		<tr>
+			<th>Name</th>
+			<th>Entry Date</th>
+			<th>Exit Date</th>
+			<th>Starting Value</th>
+			<th>Salvage Value</th>
+			<th>Actions</th>
+		</tr>
+	</thead>
+	<tbody>
+		@foreach (var asset in Assets)
+		{
+			<tr>
+				<td>@asset.Name</td>
+				<td>@asset.EntryDate.ToShortDateString()</td>
+				<td>@asset.ExitDate.ToShortDateString()</td>
+				<td>@asset.StartingValue</td>
+				<td>@asset.SalvageValue</td>
+				<td>
+					<button class="btn btn-primary" @onclick="() => EditViewAsset(asset.Id)">Edit/View</button>
+					<button class="btn btn-danger" @onclick="() => DeleteAsset(asset.Id)">Delete</button>
+				</td>
+			</tr>
+		}
+	</tbody>
+</table>
+
+@* Button to add a new asset for the user*@
+<button class="btn btn-success" @onclick="AddAsset">Add Asset</button>
+
+@* Table to display total inventory value by year *@
+<h4>Total Inventory Value by Year</h4>
+<table class="table">
+	<thead>
+		<tr>
+			<th>Year</th>
+			<th>Total Value</th>
+		</tr>
+	</thead>
+	<tbody>
+		@foreach (var value in InventoryValues)
+		{
+			<tr>
+				<td>@value.Year</td>
+				<td>@value.TotalValue</td>
+			</tr>
+		}
+	</tbody>
+</table>
+
+@code {
+	private List<Asset> Assets = new();
+	private List<YearlyInventoryValue> InventoryValues = new();
+
+	private string GetFormattedDate(DateTime? date)
+	{
+		if (date.HasValue && date != DateTime.MinValue)
+		{
+			return date.Value.ToShortDateString();
+		}
+
+		// Return a placeholder or message if the date is invalid
+		return "Invalid Date";
+	}
+
+	//Validation of date to make sure user inputs properly set dates
+	private void ValidateDates()
+	{
+		foreach (var asset in Assets)
+		{
+			if (asset.EntryDate == DateTime.MinValue || asset.ExitDate == DateTime.MinValue)
+			{
+				throw new ArgumentException("EntryDate and ExitDate must be valid.");
+			}
+
+			if (asset.EntryDate >= asset.ExitDate)
+			{
+				throw new ArgumentException($"Asset '{asset.Name}' has an invalid date range.");
+			}
+		}
+	}
+
+
+	protected override void OnInitialized()
+	{
+		// Ensure the lists are always initialized
+		Assets = Database.Asset.ToList();
+		//Assets ??= new List<Asset>();
+		InventoryValues ??= new List<YearlyInventoryValue>();
+
+		if (InventoryValues.Count == 0)
+		{
+			//Calculate total inventory value by year
+			CalculateInventoryValues();
+		}
+	}
+
+	private void AddAsset()
+	{
+		Console.WriteLine("Navigating to Add Asset page.");
+		Navigation.NavigateTo("/Asset-Details");
+	}
+
+	private void EditViewAsset(int id)
+	{
+		//Navigate to edit page
+		Console.WriteLine($"EditViewAsset called with ID: {id}");
+		Navigation.NavigateTo($"/Asset-Details/{id}");
+	}
+
+	private void DeleteAsset(int id)
+	{
+		Console.WriteLine($"Deleting asset with ID: {id}");
+		//Delete the aset from the list
+		Assets.RemoveAll(a => a.Id == id);
+	}
+
+	private void CalculateInventoryValues()
+	{
+		// Always ensure InventoryValues is initialized
+		InventoryValues ??= new List<YearlyInventoryValue>();
+
+		InventoryValues.Clear();
+		InventoryValues.Add(new YearlyInventoryValue { Year = DateTime.Now.Year - 2, TotalValue = 2000 });
+		InventoryValues.Add(new YearlyInventoryValue { Year = DateTime.Now.Year - 1, TotalValue = 1500 });
+		InventoryValues.Add(new YearlyInventoryValue { Year = DateTime.Now.Year, TotalValue = 1000 });
+	}
+
+	public class YearlyInventoryValue
+	{
+		public int Year { get; set; }
+		public double TotalValue { get; set; }
+	}
+}
